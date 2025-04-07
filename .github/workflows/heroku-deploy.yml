@@ -5,7 +5,7 @@ on:
     branches: [ main, master ]
 
 jobs:
-  deploy:
+  deploy-backend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -18,6 +18,50 @@ jobs:
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
           team: "dartslive"
           
-      - name: Deploy to Heroku
+      - name: Deploy Backend to Heroku
         run: |
-          git push https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/lib-mgmt-dl-ezo.git HEAD:main
+          git push https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/lib-mgmt-dl-ezo.git `git subtree split --prefix backend HEAD`:main
+          
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    needs: deploy-backend
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install Dependencies
+        run: |
+          cd frontend
+          npm install
+          
+      - name: Build Frontend
+        run: |
+          cd frontend
+          npm run build
+          
+      - name: Login to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.14
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: "lib-mgmt-dl-ezo-frontend"
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          team: "dartslive"
+          buildpack: "heroku/nodejs"
+          
+      - name: Set Backend URL
+        run: |
+          heroku config:set VITE_API_URL=https://lib-mgmt-dl-ezo.herokuapp.com -a lib-mgmt-dl-ezo-frontend
+          
+      - name: Deploy Frontend to Heroku
+        run: |
+          cd frontend
+          git init
+          git add .
+          git config --global user.email "devin-ai-integration[bot]@users.noreply.github.com"
+          git config --global user.name "Devin AI"
+          git commit -m "Deploy frontend to Heroku"
+          git push https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/lib-mgmt-dl-ezo-frontend.git HEAD:main --force
