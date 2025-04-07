@@ -4,7 +4,7 @@
   "repository": "https://github.com/dl-ezo/library-management-system",
   "keywords": ["python", "fastapi", "react", "library", "management"],
   "addons": [
-    "heroku-postgresql:mini"
+    "heroku-postgresql:essential-0"
   ],
   "buildpacks": [
     {
