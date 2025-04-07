@@ -15,14 +15,14 @@ if [ -z "$HEROKU_API_KEY" ]; then
     exit 1
 fi
 
-echo "Creating Heroku app..."
-heroku create library-management-system || echo "App may already exist, continuing..."
+echo "Creating Heroku app under team dartslive..."
+heroku create library-management-system --team dartslive || echo "App may already exist, continuing..."
 
 echo "Adding PostgreSQL addon..."
-heroku addons:create heroku-postgresql:mini --app library-management-system || echo "PostgreSQL addon may already exist, continuing..."
+heroku addons:create heroku-postgresql:mini --app library-management-system --team dartslive || echo "PostgreSQL addon may already exist, continuing..."
 
 echo "Setting environment variables..."
-heroku config:set PYTHON_VERSION=3.10.0 --app library-management-system
+heroku config:set PYTHON_VERSION=3.10.0 --app library-management-system --team dartslive
 
 echo "Heroku setup completed successfully!"
 echo "To deploy, run: git push heroku main"
