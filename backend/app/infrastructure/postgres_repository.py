@@ -1,4 +1,4 @@
-Sfrom typing import List, Optional
+from typing import List, Optional
 from datetime import date
 import psycopg
 from app.domain.models import Book
