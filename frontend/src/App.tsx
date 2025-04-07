@@ -1,15 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import { useState } from 'react'
 import './App.css'
 import { BookList } from './components/BookList'
 import { AddBookForm } from './components/AddBookForm'
 import { BorrowBookForm } from './components/BorrowBookForm'
-import { fetchBook, returnBook } from './lib/api'
-import { Book } from './types/book'
-import { Button } from './components/ui/button'
+import { returnBook } from './lib/api'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './components/ui/dialog'
 
 function App() {
-  const [books, setBooks] = useState<Book[]>([]);
   const [selectedBookId, setSelectedBookId] = useState<number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
