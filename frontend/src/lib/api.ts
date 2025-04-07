@@ -53,7 +53,8 @@ export const borrowBook = async (id: number, borrowerName: string, returnDate: s
   });
   
   if (!response.ok) {
-    throw new Error('Failed to borrow book');
+    const errorData = await response.json();
+    throw new Error(`Failed to borrow book: ${JSON.stringify(errorData)}`);
   }
   return response.json();
 };
