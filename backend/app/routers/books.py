@@ -1,61 +1,74 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from typing import List, Optional
 from datetime import date
-from app.models.book import Book, BookCreate
+from pydantic import BaseModel
+from app.application.services import BookService
+from app.domain.models import Book as DomainBook
+from app.dependencies import get_book_service
 
 router = APIRouter(
     prefix="/books",
     tags=["books"],
 )
 
-books_db = []
-book_id_counter = 1
+class BookBase(BaseModel):
+    title: str
+
+class BookCreate(BookBase):
+    pass
+
+class Book(BookBase):
+    id: int
+    borrower_name: Optional[str] = None
+    return_date: Optional[date] = None
+
+    class Config:
+        from_attributes = True
+
+def domain_to_dto(book: DomainBook) -> Book:
+    return Book(
+        id=book.id,
+        title=book.title,
+        borrower_name=book.borrower_name,
+        return_date=book.return_date
+    )
 
 @router.post("/", response_model=Book)
-async def create_book(book: BookCreate):
-    global book_id_counter
-    new_book = Book(
-        id=book_id_counter,
-        title=book.title,
-        borrower_name=None,
-        return_date=None
-    )
-    books_db.append(new_book)
-    book_id_counter += 1
-    return new_book
+async def create_book(book: BookCreate, service: BookService = Depends(get_book_service)):
+    domain_book = service.create_book(book.title)
+    return domain_to_dto(domain_book)
 
 @router.get("/", response_model=List[Book])
-async def read_books(title: Optional[str] = None, borrower_name: Optional[str] = None):
-    if title and borrower_name:
-        return [book for book in books_db if title.lower() in book.title.lower() and 
-                book.borrower_name and borrower_name.lower() in book.borrower_name.lower()]
-    elif title:
-        return [book for book in books_db if title.lower() in book.title.lower()]
-    elif borrower_name:
-        return [book for book in books_db if book.borrower_name and borrower_name.lower() in book.borrower_name.lower()]
-    return books_db
+async def read_books(
+    title: Optional[str] = None, 
+    borrower_name: Optional[str] = None, 
+    service: BookService = Depends(get_book_service)
+):
+    domain_books = service.get_books(title, borrower_name)
+    return [domain_to_dto(book) for book in domain_books]
 
 @router.get("/{book_id}", response_model=Book)
-async def read_book(book_id: int):
-    for book in books_db:
-        if book.id == book_id:
-            return book
-    raise HTTPException(status_code=404, detail="Book not found")
+async def read_book(book_id: int, service: BookService = Depends(get_book_service)):
+    domain_book = service.get_book(book_id)
+    if not domain_book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return domain_to_dto(domain_book)
 
 @router.put("/{book_id}/borrow", response_model=Book)
-async def borrow_book(book_id: int, borrower_name: str, return_date: date):
-    for book in books_db:
-        if book.id == book_id:
-            book.borrower_name = borrower_name
-            book.return_date = return_date
-            return book
-    raise HTTPException(status_code=404, detail="Book not found")
+async def borrow_book(
+    book_id: int, 
+    borrower_name: str, 
+    return_date: date, 
+    service: BookService = Depends(get_book_service)
+):
+    domain_book = service.borrow_book(book_id, borrower_name, return_date)
+    if not domain_book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return domain_to_dto(domain_book)
 
 @router.put("/{book_id}/return", response_model=Book)
-async def return_book(book_id: int):
-    for book in books_db:
-        if book.id == book_id:
-            book.borrower_name = None
-            book.return_date = None
-            return book
-    raise HTTPException(status_code=404, detail="Book not found")
+async def return_book(book_id: int, service: BookService = Depends(get_book_service)):
+    domain_book = service.return_book(book_id)
+    if not domain_book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return domain_to_dto(domain_book)
