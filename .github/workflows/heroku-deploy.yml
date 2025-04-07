@@ -28,6 +28,8 @@ jobs:
       - name: Create Heroku Backend App
         run: |
           heroku apps:info -a lib-mgmt-dl-ezo || heroku create lib-mgmt-dl-ezo --team dartslive
+          # Set stack to container
+          heroku stack:set container -a lib-mgmt-dl-ezo
           # Add PostgreSQL addon if it doesn't exist
           heroku addons:info postgresql -a lib-mgmt-dl-ezo || heroku addons:create heroku-postgresql:essential-0 -a lib-mgmt-dl-ezo
       
@@ -69,6 +71,8 @@ jobs:
       - name: Create Heroku Frontend App
         run: |
           heroku apps:info -a lib-mgmt-dl-ezo-frontend || heroku create lib-mgmt-dl-ezo-frontend --team dartslive
+          # Set stack to container
+          heroku stack:set container -a lib-mgmt-dl-ezo-frontend
       
       - name: Set Backend URL
         run: |
