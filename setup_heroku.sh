@@ -16,13 +16,13 @@ if [ -z "$HEROKU_API_KEY" ]; then
 fi
 
 echo "Creating Heroku app under team dartslive..."
-heroku create library-management-system --team dartslive || echo "App may already exist, continuing..."
+heroku create lib-mgmt-dl-ezo --team dartslive || echo "App may already exist, continuing..."
 
 echo "Adding PostgreSQL addon..."
-heroku addons:create heroku-postgresql:mini --app library-management-system --team dartslive || echo "PostgreSQL addon may already exist, continuing..."
+heroku addons:create heroku-postgresql:essential-0 -a lib-mgmt-dl-ezo || echo "PostgreSQL addon may already exist, continuing..."
 
 echo "Setting environment variables..."
-heroku config:set PYTHON_VERSION=3.10.0 --app library-management-system --team dartslive
+heroku config:set PYTHON_VERSION=3.10.0 -a lib-mgmt-dl-ezo
 
 echo "Heroku setup completed successfully!"
 echo "To deploy, run: git push heroku main"

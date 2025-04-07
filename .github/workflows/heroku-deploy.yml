@@ -14,10 +14,10 @@ jobs:
         uses: akhileshns/heroku-deploy@v3.12.14
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: "library-management-system"
+          heroku_app_name: "lib-mgmt-dl-ezo"
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
           team: "dartslive"
           
       - name: Deploy to Heroku
         run: |
-          git push https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/library-management-system.git HEAD:main
+          git push https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/lib-mgmt-dl-ezo.git HEAD:main
