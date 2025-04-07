@@ -9,9 +9,9 @@ app = FastAPI(title="Company Library Management System")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://lib-mgmt-dl-ezo-frontend-9f84ec585ef2.herokuapp.com",
-        "http://localhost:3000",  # For local development
-        "http://localhost:5173",  # For Vite dev server
+        "https://*.herokuapp.com",  # Allow all Heroku domains
+        "http://localhost:3000",    # For local development
+        "http://localhost:5173",    # For Vite dev server
     ],
     allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
