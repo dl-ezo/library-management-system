@@ -10,6 +10,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
+      - name: Setup Heroku CLI
+        uses: AkhileshNS/heroku-deploy@v3.12.14
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          justlogin: true
+      
       - name: Login to Heroku
         uses: akhileshns/heroku-deploy@v3.12.14
         with:
@@ -42,6 +49,13 @@ jobs:
         run: |
           cd frontend
           npm run build
+          
+      - name: Setup Heroku CLI
+        uses: AkhileshNS/heroku-deploy@v3.12.14
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          justlogin: true
           
       - name: Login to Heroku
         uses: akhileshns/heroku-deploy@v3.12.14
