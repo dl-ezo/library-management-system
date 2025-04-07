@@ -1,0 +1,20 @@
+{
+  "name": "Company Library Management System",
+  "description": "A web application for managing company library books",
+  "repository": "https://github.com/dl-ezo/library-management-system",
+  "keywords": ["python", "fastapi", "react", "library", "management"],
+  "addons": [
+    "heroku-postgresql:mini"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "env": {
+    "PYTHON_VERSION": {
+      "description": "Python version to use",
+      "value": "3.10.0"
+    }
+  }
+}
