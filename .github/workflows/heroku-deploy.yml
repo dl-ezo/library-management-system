@@ -1,0 +1,22 @@
+name: Heroku Deployment
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Login to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.14
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: "library-management-system"
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          
+      - name: Deploy to Heroku
+        run: |
+          git push https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/library-management-system.git HEAD:main
