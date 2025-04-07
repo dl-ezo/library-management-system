@@ -54,14 +54,17 @@ async def read_book(book_id: int, service: BookService = Depends(get_book_servic
         raise HTTPException(status_code=404, detail="Book not found")
     return domain_to_dto(domain_book)
 
+class BorrowRequest(BaseModel):
+    borrower_name: str
+    return_date: date
+
 @router.put("/{book_id}/borrow", response_model=Book)
 async def borrow_book(
     book_id: int, 
-    borrower_name: str, 
-    return_date: date, 
+    borrow_data: BorrowRequest,
     service: BookService = Depends(get_book_service)
 ):
-    domain_book = service.borrow_book(book_id, borrower_name, return_date)
+    domain_book = service.borrow_book(book_id, borrow_data.borrower_name, borrow_data.return_date)
     if not domain_book:
         raise HTTPException(status_code=404, detail="Book not found")
     return domain_to_dto(domain_book)
