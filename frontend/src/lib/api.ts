@@ -1,6 +1,6 @@
 import { Book } from '../types/book';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 export const fetchBooks = async (title?: string, borrowerName?: string): Promise<Book[]> => {
   let url = `${API_URL}/books`;
