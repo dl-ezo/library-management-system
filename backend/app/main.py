@@ -21,10 +21,10 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
-
 app.include_router(books.router)
 
 @app.get("/healthz")
 async def healthz():
     return {"status": "ok"}
+
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
