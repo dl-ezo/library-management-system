@@ -5,9 +5,9 @@ cd frontend
 npm install
 npm run build
 
-echo "Copying frontend build to backend static directory..."
-rm -rf ../backend/static
-mkdir -p ../backend/static
-cp -r dist/* ../backend/static/
+echo "Copying frontend build to static directory..."
+rm -rf ../static
+mkdir -p ../static
+cp -r dist/* ../static/
 
 echo "Build completed successfully!"
