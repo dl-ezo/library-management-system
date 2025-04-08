@@ -6,7 +6,10 @@ from app.config import settings
 def get_connection():
     """データベース接続を取得する"""
     if settings.DATABASE_URL:
-        return psycopg.connect(settings.DATABASE_URL)
+        db_url = settings.DATABASE_URL
+        if db_url.startswith('postgres://'):
+            db_url = db_url.replace('postgres://', 'postgresql://', 1)
+        return psycopg.connect(db_url)
     else:
         return None
 
