@@ -14,7 +14,7 @@ WORKDIR /app/backend
 RUN pip install poetry
 COPY backend/pyproject.toml backend/poetry.lock ./
 RUN poetry config virtualenvs.create false && \
-    poetry install --without dev --no-interaction --no-ansi
+    poetry install --without dev --no-root --no-interaction --no-ansi
 
 # Stage 3: Final image
 FROM python:3.12-slim
