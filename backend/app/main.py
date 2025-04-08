@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+import os
 import psycopg
 from app.routers import books
 
@@ -18,6 +20,8 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
+
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 app.include_router(books.router)
 

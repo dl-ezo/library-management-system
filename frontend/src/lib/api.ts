@@ -1,6 +1,6 @@
 import { Book } from '../types/book';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://lib-mgmt-dl-ezo.herokuapp.com';
+const API_URL = '';
 
 export const fetchBooks = async (title?: string, borrowerName?: string): Promise<Book[]> => {
   let url = `${API_URL}/books`;
