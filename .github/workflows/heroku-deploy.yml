@@ -10,17 +10,42 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Login to Heroku
-        uses: akhileshns/heroku-deploy@v3.12.14
-        with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: "lib-mgmt-dl-ezo"
-          heroku_email: ${{ secrets.HEROKU_EMAIL }}
-          team: "dartslive"
-          
-      - name: Deploy Backend to Heroku
+      - name: Install Heroku CLI
         run: |
-          git push https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/lib-mgmt-dl-ezo.git `git subtree split --prefix backend HEAD`:main
+          curl https://cli-assets.heroku.com/install.sh | sh
+          cat > ~/.netrc << EOF
+          machine api.heroku.com
+            login ${{ secrets.HEROKU_EMAIL }}
+            password ${{ secrets.HEROKU_API_KEY }}
+          machine git.heroku.com
+            login ${{ secrets.HEROKU_EMAIL }}
+            password ${{ secrets.HEROKU_API_KEY }}
+          EOF
+      
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Create Heroku Backend App
+        run: |
+          heroku apps:info -a lib-mgmt-dl-ezo || heroku create lib-mgmt-dl-ezo --team dartslive
+          # Set stack to container
+          heroku stack:set container -a lib-mgmt-dl-ezo
+          # Add PostgreSQL addon if it doesn't exist
+          heroku addons:info postgresql -a lib-mgmt-dl-ezo || heroku addons:create heroku-postgresql:essential-0 -a lib-mgmt-dl-ezo
+      
+      - name: Login to Heroku Container Registry
+        run: |
+          heroku container:login
+      
+      - name: Build and Push Backend Docker Image
+        run: |
+          cd backend
+          docker build -t registry.heroku.com/lib-mgmt-dl-ezo/web .
+          docker push registry.heroku.com/lib-mgmt-dl-ezo/web
+      
+      - name: Release Backend
+        run: |
+          heroku container:release web -a lib-mgmt-dl-ezo
           
   deploy-frontend:
     runs-on: ubuntu-latest
@@ -28,40 +53,41 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          
-      - name: Install Dependencies
+      - name: Install Heroku CLI
         run: |
-          cd frontend
-          npm install
-          
-      - name: Build Frontend
+          curl https://cli-assets.heroku.com/install.sh | sh
+          cat > ~/.netrc << EOF
+          machine api.heroku.com
+            login ${{ secrets.HEROKU_EMAIL }}
+            password ${{ secrets.HEROKU_API_KEY }}
+          machine git.heroku.com
+            login ${{ secrets.HEROKU_EMAIL }}
+            password ${{ secrets.HEROKU_API_KEY }}
+          EOF
+      
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Create Heroku Frontend App
         run: |
-          cd frontend
-          npm run build
-          
-      - name: Login to Heroku
-        uses: akhileshns/heroku-deploy@v3.12.14
-        with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: "lib-mgmt-dl-ezo-frontend"
-          heroku_email: ${{ secrets.HEROKU_EMAIL }}
-          team: "dartslive"
-          buildpack: "heroku/nodejs"
-          
+          heroku apps:info -a lib-mgmt-dl-ezo-frontend || heroku create lib-mgmt-dl-ezo-frontend --team dartslive
+          # Set stack to container
+          heroku stack:set container -a lib-mgmt-dl-ezo-frontend
+      
       - name: Set Backend URL
         run: |
-          heroku config:set VITE_API_URL=https://lib-mgmt-dl-ezo.herokuapp.com -a lib-mgmt-dl-ezo-frontend
-          
-      - name: Deploy Frontend to Heroku
+          heroku config:set API_URL=https://lib-mgmt-dl-ezo.herokuapp.com -a lib-mgmt-dl-ezo-frontend
+      
+      - name: Login to Heroku Container Registry
+        run: |
+          heroku container:login
+      
+      - name: Build and Push Frontend Docker Image
         run: |
           cd frontend
-          git init
-          git add .
-          git config --global user.email "devin-ai-integration[bot]@users.noreply.github.com"
-          git config --global user.name "Devin AI"
-          git commit -m "Deploy frontend to Heroku"
-          git push https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/lib-mgmt-dl-ezo-frontend.git HEAD:main --force
+          docker build -t registry.heroku.com/lib-mgmt-dl-ezo-frontend/web .
+          docker push registry.heroku.com/lib-mgmt-dl-ezo-frontend/web
+      
+      - name: Release Frontend
+        run: |
+          heroku container:release web -a lib-mgmt-dl-ezo-frontend
