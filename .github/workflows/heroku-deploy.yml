@@ -21,9 +21,9 @@ jobs:
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
           team: "dartslive"
           
-      - name: Set Heroku stack to container
+      - name: Set Heroku stack to heroku-22
         run: |
-          heroku stack:set container -a lib-mgmt-dl-ezo
+          heroku stack:set heroku-22 -a lib-mgmt-dl-ezo
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
           
