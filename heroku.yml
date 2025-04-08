@@ -1,6 +1,6 @@
 build:
-  languages:
-    - python
-    - nodejs
+  docker:
+    web: Dockerfile
+stack: heroku-22
 run:
   web: cd backend && poetry run uvicorn app.main:app --host=0.0.0.0 --port=${PORT:-8000}
