@@ -21,14 +21,12 @@ jobs:
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
           team: "dartslive"
           
-      - name: Set buildpacks
+      - name: Set Heroku stack to container
         run: |
-          heroku buildpacks:clear -a lib-mgmt-dl-ezo
-          heroku buildpacks:add heroku/nodejs -a lib-mgmt-dl-ezo
-          heroku buildpacks:add heroku/python -a lib-mgmt-dl-ezo
+          heroku stack:set container -a lib-mgmt-dl-ezo
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
           
       - name: Deploy to Heroku
         run: |
-          git push https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/lib-mgmt-dl-ezo.git HEAD:main
+          git push https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/lib-mgmt-dl-ezo.git HEAD:main --force
