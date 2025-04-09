@@ -1,5 +1,6 @@
 import { Book } from '../types/book';
 
+// バックエンドがプレフィックスを付与するのでAPIのURLを明示的に指定
 const API_URL = '/api';
 
 export const fetchBooks = async (title?: string, borrowerName?: string): Promise<Book[]> => {

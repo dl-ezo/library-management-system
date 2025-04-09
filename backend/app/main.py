@@ -27,4 +27,8 @@ app.include_router(books.router, prefix="/api")
 async def healthz():
     return {"status": "ok"}
 
+@app.get("/api/healthz")
+async def api_healthz():
+    return {"status": "ok"}
+
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
