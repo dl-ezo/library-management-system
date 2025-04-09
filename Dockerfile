@@ -35,7 +35,8 @@ WORKDIR /app/backend
 # Install poetry and create a proper environment
 RUN pip install poetry && \
     cd /app/backend && \
-    poetry install --without dev --no-root --no-interaction
+    poetry install --without dev --no-root --no-interaction && \
+    pip install uvicorn
 
 # Run the application
 CMD ["sh", "-c", "cd /app/backend && poetry run uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
