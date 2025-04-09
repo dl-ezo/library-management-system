@@ -2,8 +2,10 @@ import pytest
 from fastapi.testclient import TestClient
 from datetime import date, timedelta
 
+# テスト時にapp.mainをインポートするためのインポート
 from app.main import app
 
+# テストクライアントを作成
 client = TestClient(app)
 
 def test_create_book():
