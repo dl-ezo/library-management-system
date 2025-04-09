@@ -9,4 +9,7 @@ pip install poetry
 poetry config virtualenvs.create false
 poetry install --without dev --no-interaction --no-root
 
+echo "Installing uvicorn globally..."
+pip install --no-cache-dir uvicorn[standard]
+
 echo "Heroku post-build completed successfully!"

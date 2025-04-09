@@ -38,5 +38,5 @@ RUN pip install --no-cache-dir poetry uvicorn[standard] && \
     poetry config virtualenvs.create false && \
     poetry install --without dev --no-root --no-interaction
 
-# Run the application using global uvicorn instead of poetry run
-CMD ["sh", "-c", "cd /app/backend && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Run the application using python -m for more reliable execution
+CMD ["sh", "-c", "cd /app/backend && python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
