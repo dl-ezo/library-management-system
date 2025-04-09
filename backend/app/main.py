@@ -21,7 +21,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-app.include_router(books.router)
+app.include_router(books.router, prefix="/api")
 
 @app.get("/healthz")
 async def healthz():
