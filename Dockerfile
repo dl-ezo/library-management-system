@@ -32,11 +32,11 @@ COPY --from=frontend-builder /app/frontend/dist/ /app/backend/static/
 # Set working directory to backend
 WORKDIR /app/backend
 
-# Install poetry and create a proper environment
-RUN pip install poetry && \
+# Install poetry, uvicorn globally, and create a proper environment
+RUN pip install --no-cache-dir poetry uvicorn[standard] && \
     cd /app/backend && \
-    poetry install --without dev --no-root --no-interaction && \
-    pip install uvicorn
+    poetry config virtualenvs.create false && \
+    poetry install --without dev --no-root --no-interaction
 
-# Run the application
-CMD ["sh", "-c", "cd /app/backend && poetry run uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Run the application using global uvicorn instead of poetry run
+CMD ["sh", "-c", "cd /app/backend && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
