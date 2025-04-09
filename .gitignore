@@ -1,0 +1,38 @@
+# Node.js関連
+node_modules/
+npm-debug.log
+yarn-error.log
+.pnpm-debug.log
+
+# ビルド生成物
+dist/
+build/
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 環境設定
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+venv/
+env/
+ENV/
+
+# 静的ファイル（自動生成）
+backend/static/
