@@ -4,7 +4,7 @@ import { Book } from '../types/book';
 const API_URL = '/api';
 
 export const fetchBooks = async (title?: string, borrowerName?: string): Promise<Book[]> => {
-  let url = `${API_URL}/books`;
+  let url = `${API_URL}/books/`;
   const params = new URLSearchParams();
   
   if (title) params.append('title', title);
