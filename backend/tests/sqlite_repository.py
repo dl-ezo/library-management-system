@@ -77,6 +77,14 @@ class SQLiteBookRepository(BookRepository):
         
         return [self._row_to_book(row) for row in rows]
     
+    def delete(self, book_id: int) -> bool:
+        """本を削除する"""
+        cursor = self.conn.cursor()
+        cursor.execute("DELETE FROM books WHERE id = ?", (book_id,))
+        deleted = cursor.rowcount > 0
+        self.conn.commit()
+        return deleted
+        
     def _row_to_book(self, row: tuple) -> Book:
         """SQLiteの行をBookオブジェクトに変換する"""
         book_id, title, borrower_name, return_date = row
