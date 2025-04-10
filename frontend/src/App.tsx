@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from './components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Settings } from 'lucide-react';
 import { Button } from './components/ui/button';
+import { ThemeToggle } from './components/theme/ThemeToggle';
 
 function App() {
   const [selectedBookId, setSelectedBookId] = useState<number | null>(null);
@@ -60,14 +61,17 @@ function App() {
     <div className="container mx-auto py-8 px-4">
       <div className="flex items-center mb-8">
         <h1 className="text-3xl font-bold text-center flex-grow">社内図書管理システム</h1>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="ml-2"
-          onClick={() => setShowMasterManagement(true)}
-        >
-          <Settings className="h-5 w-5" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="ml-2"
+            onClick={() => setShowMasterManagement(true)}
+          >
+            <Settings className="h-5 w-5" />
+          </Button>
+        </div>
       </div>
       
       {showMasterManagement ? (
