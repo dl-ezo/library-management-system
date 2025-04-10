@@ -53,6 +53,13 @@ class TestInMemoryBookRepository(BookRepository):
             result = [book for book in result if book.borrower_name and borrower_name == book.borrower_name]
         
         return result
+        
+    def delete(self, book_id: int) -> bool:
+        """本を削除する"""
+        if book_id in self.books:
+            del self.books[book_id]
+            return True
+        return False
 
 @pytest.fixture(scope="function", autouse=True)
 def setup_test_service():
