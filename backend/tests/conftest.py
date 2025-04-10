@@ -61,7 +61,9 @@ class TestInMemoryBookRepository(BookRepository):
             return True
         return False
 
-@pytest.fixture(scope="function", autouse=True)
+_shared_repository = TestInMemoryBookRepository()
+
+@pytest.fixture(scope="module", autouse=True)
 def setup_test_service():
     """テスト用サービスのセットアップ"""
     # app.dependenciesをモンキーパッチしてテスト用リポジトリを使用
@@ -72,7 +74,7 @@ def setup_test_service():
     
     # テスト用のget_book_service関数を作成
     def mock_get_book_service():
-        return BookService(repository=TestInMemoryBookRepository())
+        return BookService(repository=_shared_repository)
     
     # モンキーパッチ適用
     dependencies.get_book_service = mock_get_book_service

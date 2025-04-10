@@ -21,12 +21,12 @@ def test_create_book():
     assert data["return_date"] is None
 
 def test_read_books():
-    client.post("/api/books/", json={"title": "検索テスト本"})
-    
-    response = client.get("/api/books/")
+    response = client.post("/api/books/", json={"title": "検索テスト本"})
     assert response.status_code == 200
-    data = response.json()
-    assert len(data) > 0
+    book_id = response.json()["id"]
+    
+    response = client.get(f"/api/books/{book_id}")
+    assert response.status_code == 200
     
     response = client.get("/api/books/?title=検索テスト")
     assert response.status_code == 200
@@ -36,7 +36,11 @@ def test_read_books():
 
 def test_borrow_book():
     response = client.post("/api/books/", json={"title": "貸出テスト本"})
+    assert response.status_code == 200
     book_id = response.json()["id"]
+    
+    response = client.get(f"/api/books/{book_id}")
+    assert response.status_code == 200
     
     tomorrow = (date.today() + timedelta(days=1)).isoformat()
     response = client.put(
@@ -56,13 +60,18 @@ def test_borrow_book():
 
 def test_return_book():
     response = client.post("/api/books/", json={"title": "返却テスト本"})
+    assert response.status_code == 200
     book_id = response.json()["id"]
     
+    response = client.get(f"/api/books/{book_id}")
+    assert response.status_code == 200
+    
     tomorrow = (date.today() + timedelta(days=1)).isoformat()
-    client.put(
+    response = client.put(
         f"/api/books/{book_id}/borrow",
         json={"borrower_name": "テストユーザー", "return_date": tomorrow}
     )
+    assert response.status_code == 200
     
     response = client.put(f"/api/books/{book_id}/return")
     assert response.status_code == 200
@@ -72,6 +81,7 @@ def test_return_book():
 
 def test_delete_book():
     response = client.post("/api/books/", json={"title": "削除テスト本"})
+    assert response.status_code == 200
     book_id = response.json()["id"]
     
     response = client.get(f"/api/books/{book_id}")
