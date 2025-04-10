@@ -1,9 +1,10 @@
 import { Book } from '../types/book';
 
-const API_URL = '';
+// バックエンドがプレフィックスを付与するのでAPIのURLを明示的に指定
+const API_URL = '/api';
 
 export const fetchBooks = async (title?: string, borrowerName?: string): Promise<Book[]> => {
-  let url = `${API_URL}/books`;
+  let url = `${API_URL}/books/`;
   const params = new URLSearchParams();
   
   if (title) params.append('title', title);

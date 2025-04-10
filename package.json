@@ -1,0 +1,11 @@
+　　　　　{
+  "name": "library-management-system",
+  "version": "1.0.0",
+  "description": "Company Library Management System",
+  "engines": {
+    "node": "18.x"
+  },
+  "scripts": {
+    "heroku-postbuild": "./heroku-postbuild.sh"
+  }
+}
