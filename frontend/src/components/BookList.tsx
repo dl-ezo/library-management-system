@@ -11,9 +11,19 @@ interface BookListProps {
   refreshTrigger: number;
   onBorrowClick: (bookId: number) => void;
   onReturnClick: (bookId: number) => Promise<void>;
+  onDeleteClick?: (bookId: number) => Promise<void>;
+  showDeleteButton?: boolean;
+  showBorrowReturnButtons?: boolean;
 }
 
-export function BookList({ refreshTrigger, onBorrowClick, onReturnClick }: BookListProps) {
+export function BookList({ 
+  refreshTrigger, 
+  onBorrowClick, 
+  onReturnClick, 
+  onDeleteClick,
+  showDeleteButton = true,
+  showBorrowReturnButtons = true 
+}: BookListProps) {
   const [books, setBooks] = useState<Book[]>([]);
   const [titleSearch, setTitleSearch] = useState('');
   const [borrowerSearch, setBorrowerSearch] = useState('');
@@ -94,23 +104,36 @@ export function BookList({ refreshTrigger, onBorrowClick, onReturnClick }: BookL
                       {book.return_date ? format(new Date(book.return_date), 'yyyy/MM/dd') : '-'}
                     </TableCell>
                     <TableCell>
-                      {book.borrower_name ? (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => onReturnClick(book.id)}
-                        >
-                          返却
-                        </Button>
-                      ) : (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => onBorrowClick(book.id)}
-                        >
-                          借りる
-                        </Button>
-                      )}
+                      <div className="flex flex-row gap-2">
+                        {showBorrowReturnButtons && (
+                          book.borrower_name ? (
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => onReturnClick(book.id)}
+                            >
+                              返却
+                            </Button>
+                          ) : (
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => onBorrowClick(book.id)}
+                            >
+                              借りる
+                            </Button>
+                          )
+                        )}
+                        {showDeleteButton && onDeleteClick && (
+                          <Button 
+                            variant="destructive"
+                            size="sm" 
+                            onClick={() => onDeleteClick(book.id)}
+                          >
+                            削除
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))

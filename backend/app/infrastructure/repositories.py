@@ -37,3 +37,9 @@ class InMemoryBookRepository(BookRepository):
         if book.id in self.books:
             self.books[book.id] = book
         return book
+    
+    def delete(self, book_id: int) -> bool:
+        if book_id in self.books:
+            del self.books[book_id]
+            return True
+        return False

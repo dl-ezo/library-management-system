@@ -69,3 +69,14 @@ export const returnBook = async (id: number): Promise<Book> => {
   }
   return response.json();
 };
+
+export const deleteBook = async (id: number): Promise<void> => {
+  const response = await fetch(`${API_URL}/books/${id}`, {
+    method: 'DELETE',
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to delete book');
+  }
+  return response.json();
+};

@@ -67,3 +67,16 @@ def test_return_book():
     data = response.json()
     assert data["borrower_name"] is None
     assert data["return_date"] is None
+
+def test_delete_book():
+    response = client.post("/books/", json={"title": "削除テスト本"})
+    book_id = response.json()["id"]
+    
+    response = client.get(f"/books/{book_id}")
+    assert response.status_code == 200
+    
+    response = client.delete(f"/books/{book_id}")
+    assert response.status_code == 200
+    
+    response = client.get(f"/books/{book_id}")
+    assert response.status_code == 404

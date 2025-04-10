@@ -29,3 +29,8 @@ class BookRepository(ABC):
     def update(self, book: Book) -> Book:
         """本を更新する"""
         pass
+    
+    @abstractmethod
+    def delete(self, book_id: int) -> bool:
+        """本を削除する"""
+        pass
