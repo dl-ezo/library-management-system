@@ -53,8 +53,18 @@ class TestInMemoryBookRepository(BookRepository):
             result = [book for book in result if book.borrower_name and borrower_name == book.borrower_name]
         
         return result
+        
+    def delete(self, book_id: int) -> bool:
+        """本を削除する"""
+        if book_id in self.books:
+            del self.books[book_id]
+            return True
+        return False
 
-@pytest.fixture(scope="function", autouse=True)
+from app.infrastructure.repositories import InMemoryBookRepository
+_singleton_repository = InMemoryBookRepository()
+
+@pytest.fixture(scope="session", autouse=True)
 def setup_test_service():
     """テスト用サービスのセットアップ"""
     # app.dependenciesをモンキーパッチしてテスト用リポジトリを使用
@@ -65,7 +75,9 @@ def setup_test_service():
     
     # テスト用のget_book_service関数を作成
     def mock_get_book_service():
-        return BookService(repository=TestInMemoryBookRepository())
+        print(f"Using singleton repository with {len(_singleton_repository.books)} books")
+        print(f"Book IDs: {list(_singleton_repository.books.keys())}")
+        return BookService(repository=_singleton_repository)
     
     # モンキーパッチ適用
     dependencies.get_book_service = mock_get_book_service

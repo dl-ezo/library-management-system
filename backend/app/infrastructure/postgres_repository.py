@@ -95,3 +95,16 @@ class PostgresBookRepository(BookRepository):
         conn.commit()
         conn.close()
         return book
+        
+    def delete(self, book_id: int) -> bool:
+        conn = get_connection()
+        if not conn:
+            from app.infrastructure.repositories import InMemoryBookRepository
+            return InMemoryBookRepository().delete(book_id)
+        
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM books WHERE id = %s", (book_id,))
+            deleted = cur.rowcount > 0
+        conn.commit()
+        conn.close()
+        return deleted

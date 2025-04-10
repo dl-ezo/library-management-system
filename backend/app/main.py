@@ -31,4 +31,5 @@ async def healthz():
 async def api_healthz():
     return {"status": "ok"}
 
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
+if os.path.exists("static"):
+    app.mount("/", StaticFiles(directory="static", html=True), name="static")

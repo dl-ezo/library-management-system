@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
-from typing import List, Optional
+from typing import List, Optional, Dict
 from datetime import date
 from pydantic import BaseModel
 from app.application.services import BookService
@@ -75,3 +75,10 @@ async def return_book(book_id: int, service: BookService = Depends(get_book_serv
     if not domain_book:
         raise HTTPException(status_code=404, detail="Book not found")
     return domain_to_dto(domain_book)
+
+@router.delete("/{book_id}", response_model=Dict[str, str])
+async def delete_book(book_id: int, service: BookService = Depends(get_book_service)):
+    success = service.delete_book(book_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return {"message": "Book deleted successfully"}

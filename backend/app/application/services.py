@@ -39,3 +39,7 @@ class BookService:
         
         book.return_book()
         return self.repository.update(book)
+    
+    def delete_book(self, book_id: int) -> bool:
+        """本を削除する"""
+        return self.repository.delete(book_id)
