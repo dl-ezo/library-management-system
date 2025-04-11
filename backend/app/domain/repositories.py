@@ -21,7 +21,7 @@ class BookRepository(ABC):
         pass
     
     @abstractmethod
-    def search(self, title: Optional[str] = None, borrower_name: Optional[str] = None, sort_by_title: bool = False) -> List[Book]:
+    def search(self, title: Optional[str] = None, borrower_name: Optional[str] = None) -> List[Book]:
         """本を検索する"""
         pass
     

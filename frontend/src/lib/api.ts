@@ -1,14 +1,14 @@
 import { Book } from '../types/book';
 
-const API_URL = '';
+// バックエンドがプレフィックスを付与するのでAPIのURLを明示的に指定
+const API_URL = '/api';
 
-export const fetchBooks = async (title?: string, borrowerName?: string, sortByTitle: boolean = false): Promise<Book[]> => {
+export const fetchBooks = async (title?: string, borrowerName?: string): Promise<Book[]> => {
   let url = `${API_URL}/books/`;
   const params = new URLSearchParams();
   
   if (title) params.append('title', title);
   if (borrowerName) params.append('borrower_name', borrowerName);
-  if (sortByTitle) params.append('sort_by_title', 'true');
   
   if (params.toString()) {
     url += `?${params.toString()}`;

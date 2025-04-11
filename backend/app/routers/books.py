@@ -42,10 +42,9 @@ async def create_book(book: BookCreate, service: BookService = Depends(get_book_
 async def read_books(
     title: Optional[str] = None, 
     borrower_name: Optional[str] = None, 
-    sort_by_title: bool = False,
     service: BookService = Depends(get_book_service)
 ):
-    domain_books = service.get_books(title, borrower_name, sort_by_title)
+    domain_books = service.get_books(title, borrower_name)
     return [domain_to_dto(book) for book in domain_books]
 
 @router.get("/{book_id}", response_model=Book)
