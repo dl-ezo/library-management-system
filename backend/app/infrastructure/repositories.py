@@ -22,7 +22,7 @@ class InMemoryBookRepository(BookRepository):
     def get_all(self) -> List[Book]:
         return list(self.books.values())
     
-    def search(self, title: Optional[str] = None, borrower_name: Optional[str] = None) -> List[Book]:
+    def search(self, title: Optional[str] = None, borrower_name: Optional[str] = None, sort_by_title: bool = False) -> List[Book]:
         result = self.get_all()
         
         if title:
@@ -30,6 +30,9 @@ class InMemoryBookRepository(BookRepository):
         
         if borrower_name:
             result = [book for book in result if book.borrower_name and borrower_name.lower() in book.borrower_name.lower()]
+        
+        if sort_by_title:
+            result = sorted(result, key=lambda book: book.title.lower())
         
         return result
     

@@ -27,12 +27,13 @@ export function BookList({
   const [books, setBooks] = useState<Book[]>([]);
   const [titleSearch, setTitleSearch] = useState('');
   const [borrowerSearch, setBorrowerSearch] = useState('');
+  const [sortByTitle, setSortByTitle] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const loadBooks = async () => {
     setLoading(true);
     try {
-      const data = await fetchBooks(titleSearch || undefined, borrowerSearch || undefined);
+      const data = await fetchBooks(titleSearch || undefined, borrowerSearch || undefined, sortByTitle);
       setBooks(data);
     } catch (error) {
       console.error('Failed to fetch books:', error);
@@ -43,10 +44,16 @@ export function BookList({
 
   useEffect(() => {
     loadBooks();
-  }, [refreshTrigger]);
+  }, [refreshTrigger, sortByTitle]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    loadBooks();
+  };
+  
+  const handleToggleSort = () => {
+    const newSortState = !sortByTitle;
+    setSortByTitle(newSortState);
     loadBooks();
   };
 
@@ -72,6 +79,13 @@ export function BookList({
             />
           </div>
           <Button type="submit">検索</Button>
+          <Button 
+            type="button" 
+            variant={sortByTitle ? "default" : "outline"} 
+            onClick={handleToggleSort}
+          >
+            {sortByTitle ? "タイトルソート ↓" : "タイトルソート"}
+          </Button>
         </form>
 
         {loading ? (
