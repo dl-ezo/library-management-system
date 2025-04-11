@@ -4,6 +4,8 @@ from fastapi.staticfiles import StaticFiles
 import os
 import psycopg
 from app.routers import books
+from app.infrastructure.init_data import initialize_repository
+from app.infrastructure.repositories import InMemoryBookRepository
 
 app = FastAPI(title="Company Library Management System")
 
@@ -21,7 +23,14 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-app.include_router(books.router, prefix="/api")
+book_repo = InMemoryBookRepository()
+initialize_repository(book_repo)
+
+from app.dependencies import get_book_service
+from app.application.services import BookService
+
+app.dependency_overrides[get_book_service] = lambda: BookService(repository=book_repo)
+app.include_router(books.router)
 
 @app.get("/healthz")
 async def healthz():

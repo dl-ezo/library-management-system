@@ -6,11 +6,15 @@ import { BorrowBookForm } from './components/BorrowBookForm';
 import { returnBook, deleteBook } from './lib/api';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
+import { Settings } from 'lucide-react';
+import { Button } from './components/ui/button';
+import { ThemeToggle } from './components/theme/ThemeToggle';
 
 function App() {
   const [selectedBookId, setSelectedBookId] = useState<number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [showMasterManagement, setShowMasterManagement] = useState(false);
 
   const refreshBooks = () => {
     setRefreshTrigger(prev => prev + 1);
@@ -55,39 +59,57 @@ function App() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-8 text-center">社内図書管理システム</h1>
+      <div className="flex items-center mb-8">
+        <h1 className="text-3xl font-bold text-center flex-grow">社内図書管理システム</h1>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="ml-2"
+            onClick={() => setShowMasterManagement(true)}
+          >
+            <Settings className="h-5 w-5" />
+          </Button>
+        </div>
+      </div>
       
-      <Tabs defaultValue="management" className="mb-8">
-        <TabsList className="grid grid-cols-2 mb-4">
-          <TabsTrigger value="management">本のマスター管理</TabsTrigger>
-          <TabsTrigger value="borrow">貸出・返却管理</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="management">
-          <div className="space-y-8">
-            <AddBookForm onBookAdded={refreshBooks} />
-            
-            <BookList 
-              refreshTrigger={refreshTrigger}
-              onBorrowClick={handleBorrowClick}
-              onReturnClick={handleBookReturn}
-              onDeleteClick={handleDeleteBook}
-              showDeleteButton={true}
-              showBorrowReturnButtons={false}
-            />
+      {showMasterManagement ? (
+        <div className="space-y-8">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">本のマスター管理</h2>
+            <Button variant="outline" onClick={() => setShowMasterManagement(false)}>
+              閉じる
+            </Button>
           </div>
-        </TabsContent>
-        
-        <TabsContent value="borrow">
+          <AddBookForm onBookAdded={refreshBooks} />
+          
           <BookList 
             refreshTrigger={refreshTrigger}
             onBorrowClick={handleBorrowClick}
             onReturnClick={handleBookReturn}
-            showDeleteButton={false}
-            showBorrowReturnButtons={true}
+            onDeleteClick={handleDeleteBook}
+            showDeleteButton={true}
+            showBorrowReturnButtons={false}
           />
-        </TabsContent>
-      </Tabs>
+        </div>
+      ) : (
+        <Tabs defaultValue="borrow" className="mb-8">
+          <TabsList className="grid w-full grid-cols-1 mb-4">
+            <TabsTrigger value="borrow">貸出・返却管理</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="borrow">
+            <BookList 
+              refreshTrigger={refreshTrigger}
+              onBorrowClick={handleBorrowClick}
+              onReturnClick={handleBookReturn}
+              showDeleteButton={false}
+              showBorrowReturnButtons={true}
+            />
+          </TabsContent>
+        </Tabs>
+      )}
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>

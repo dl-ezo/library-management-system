@@ -14,9 +14,9 @@ class BookService:
         book = Book(id=0, title=title)
         return self.repository.add(book)
     
-    def get_books(self, title: Optional[str] = None, borrower_name: Optional[str] = None) -> List[Book]:
+    def get_books(self, title: Optional[str] = None, borrower_name: Optional[str] = None, sort_by_title: bool = False) -> List[Book]:
         """本を検索する"""
-        return self.repository.search(title, borrower_name)
+        return self.repository.search(title, borrower_name, sort_by_title)
     
     def get_book(self, book_id: int) -> Optional[Book]:
         """IDで本を取得する"""
