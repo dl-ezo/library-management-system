@@ -6,6 +6,7 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { format } from 'date-fns';
+import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 
 interface BookListProps {
   refreshTrigger: number;
@@ -15,6 +16,8 @@ interface BookListProps {
   showDeleteButton?: boolean;
   showBorrowReturnButtons?: boolean;
 }
+
+type SortOrder = 'asc' | 'desc' | null;
 
 export function BookList({ 
   refreshTrigger, 
@@ -28,6 +31,7 @@ export function BookList({
   const [titleSearch, setTitleSearch] = useState('');
   const [borrowerSearch, setBorrowerSearch] = useState('');
   const [loading, setLoading] = useState(false);
+  const [titleSortOrder, setTitleSortOrder] = useState<SortOrder>(null);
 
   const loadBooks = async () => {
     setLoading(true);
@@ -38,6 +42,45 @@ export function BookList({
       console.error('Failed to fetch books:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleTitleSort = () => {
+    let newSortOrder: SortOrder;
+    if (titleSortOrder === null) {
+      newSortOrder = 'asc';
+    } else if (titleSortOrder === 'asc') {
+      newSortOrder = 'desc';
+    } else {
+      newSortOrder = null;
+    }
+    setTitleSortOrder(newSortOrder);
+  };
+
+  const getSortedBooks = () => {
+    if (titleSortOrder === null) {
+      return books;
+    }
+    
+    return [...books].sort((a, b) => {
+      const aTitle = a.title.toLowerCase();
+      const bTitle = b.title.toLowerCase();
+      
+      if (titleSortOrder === 'asc') {
+        return aTitle.localeCompare(bTitle);
+      } else {
+        return bTitle.localeCompare(aTitle);
+      }
+    });
+  };
+
+  const getSortIcon = () => {
+    if (titleSortOrder === 'asc') {
+      return <ChevronUp className="h-4 w-4" />;
+    } else if (titleSortOrder === 'desc') {
+      return <ChevronDown className="h-4 w-4" />;
+    } else {
+      return <ChevronsUpDown className="h-4 w-4" />;
     }
   };
 
@@ -81,7 +124,17 @@ export function BookList({
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>
-                <TableHead>タイトル</TableHead>
+                <TableHead>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 p-0 font-medium hover:bg-transparent"
+                    onClick={handleTitleSort}
+                  >
+                    タイトル
+                    {getSortIcon()}
+                  </Button>
+                </TableHead>
                 <TableHead>借りている人</TableHead>
                 <TableHead>返却予定日</TableHead>
                 <TableHead>アクション</TableHead>
@@ -95,7 +148,7 @@ export function BookList({
                   </TableCell>
                 </TableRow>
               ) : (
-                books.map((book) => (
+                getSortedBooks().map((book) => (
                   <TableRow key={book.id}>
                     <TableCell>{book.id}</TableCell>
                     <TableCell>{book.title}</TableCell>
