@@ -43,3 +43,24 @@ APIへの接続に問題がある場合は、以下の点を確認してくだ�
 export TEST_MODE=1
 python -m pytest
 ```
+
+## 依存関係管理の重要事項
+
+新しいPythonパッケージを追加する際は、以下の**両方**のファイルを必ず更新してください：
+
+1. **`pyproject.toml`** - Poetry用の依存関係定義（CI/CDで使用）
+2. **`requirements.txt`** - Herokuデプロイ用の依存関係定義
+
+### 例：PyGithubパッケージの追加
+
+```toml
+# pyproject.toml の [tool.poetry.dependencies] セクションに追加
+pygithub = "^2.1.1"
+```
+
+```txt
+# requirements.txt に追加
+PyGithub>=2.1.1
+```
+
+**注意**: `pyproject.toml`のみ更新してCI/CDが失敗するケースが発生したため、必ず両方のファイルを同期してください。
