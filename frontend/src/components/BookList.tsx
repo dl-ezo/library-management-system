@@ -6,6 +6,7 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { format } from 'date-fns';
+import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 interface BookListProps {
   refreshTrigger: number;
@@ -28,6 +29,7 @@ export function BookList({
   const [titleSearch, setTitleSearch] = useState('');
   const [borrowerSearch, setBorrowerSearch] = useState('');
   const [loading, setLoading] = useState(false);
+  const [titleSort, setTitleSort] = useState<'none' | 'asc' | 'desc'>('none');
 
   const loadBooks = async () => {
     setLoading(true);
@@ -49,6 +51,27 @@ export function BookList({
     e.preventDefault();
     loadBooks();
   };
+
+  const handleTitleSort = () => {
+    if (titleSort === 'none') {
+      setTitleSort('asc');
+    } else if (titleSort === 'asc') {
+      setTitleSort('desc');
+    } else {
+      setTitleSort('none');
+    }
+  };
+
+  const sortedBooks = React.useMemo(() => {
+    if (titleSort === 'none') {
+      return books;
+    }
+    
+    return [...books].sort((a, b) => {
+      const comparison = a.title.localeCompare(b.title, 'ja');
+      return titleSort === 'asc' ? comparison : -comparison;
+    });
+  }, [books, titleSort]);
 
   return (
     <Card className="w-full">
@@ -81,21 +104,33 @@ export function BookList({
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>
-                <TableHead>タイトル</TableHead>
+                <TableHead>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleTitleSort}
+                    className="h-auto p-0 font-medium"
+                  >
+                    タイトル
+                    {titleSort === 'none' && <ArrowUpDown className="ml-1 h-4 w-4" />}
+                    {titleSort === 'asc' && <ArrowUp className="ml-1 h-4 w-4" />}
+                    {titleSort === 'desc' && <ArrowDown className="ml-1 h-4 w-4" />}
+                  </Button>
+                </TableHead>
                 <TableHead>借りている人</TableHead>
                 <TableHead>返却予定日</TableHead>
                 <TableHead>アクション</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {books.length === 0 ? (
+              {sortedBooks.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center">
                     図書が見つかりません
                   </TableCell>
                 </TableRow>
               ) : (
-                books.map((book) => (
+                sortedBooks.map((book) => (
                   <TableRow key={book.id}>
                     <TableCell>{book.id}</TableCell>
                     <TableCell>{book.title}</TableCell>
