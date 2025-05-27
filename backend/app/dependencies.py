@@ -7,18 +7,26 @@ import os
 # データベースの初期化
 init_db()
 
-# テストモードかどうかを確認
+# シングルトンのリポジトリインスタンス
+_repository_instance = None
+_service_instance = None
+
 def get_book_service():
     """BookServiceのインスタンスを取得する"""
-    if is_test_mode:
-        repository = InMemoryBookRepository()
-        return BookService(repository=repository)
-    else:
-        # 通常モード：PostgreSQLを使用
-        conn = get_connection()
-        if conn:
-            conn.close()
-            repository = PostgresBookRepository()
+    global _repository_instance, _service_instance
+    
+    if _service_instance is None:
+        if is_test_mode:
+            _repository_instance = InMemoryBookRepository()
         else:
-            repository = InMemoryBookRepository()
-        return BookService(repository=repository)
+            # 通常モード：PostgreSQLを使用
+            conn = get_connection()
+            if conn:
+                conn.close()
+                _repository_instance = PostgresBookRepository()
+            else:
+                _repository_instance = InMemoryBookRepository()
+        
+        _service_instance = BookService(repository=_repository_instance)
+    
+    return _service_instance
