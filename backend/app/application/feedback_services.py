@@ -13,10 +13,10 @@ class FeedbackService:
         self.repository = repository
         self.github_service = github_service
     
-    def create_feedback(self, title: str, description: str, category: str) -> Feedback:
+    def create_feedback(self, title: str, description: str, category: str, author_name: str) -> Feedback:
         """新しいフィードバックを作成する"""
         # フィードバックを作成
-        feedback = Feedback.create(title, description, category)
+        feedback = Feedback.create(title, description, category, author_name)
         
         # バリデーション
         if not feedback.is_valid_category():
@@ -27,6 +27,9 @@ class FeedbackService:
         
         if not description.strip():
             raise ValueError("詳細は必須です")
+        
+        if not author_name.strip():
+            raise ValueError("投稿者名は必須です")
         
         # リポジトリに保存
         saved_feedback = self.repository.add(feedback)

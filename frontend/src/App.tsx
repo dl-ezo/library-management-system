@@ -3,6 +3,8 @@ import './App.css';
 import { BookList } from './components/BookList';
 import { AddBookForm } from './components/AddBookForm';
 import { BorrowBookForm } from './components/BorrowBookForm';
+import { FeedbackForm } from './components/FeedbackForm';
+import { FeedbackList } from './components/FeedbackList';
 import { returnBook, deleteBook } from './lib/api';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
@@ -14,10 +16,15 @@ function App() {
   const [selectedBookId, setSelectedBookId] = useState<number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [feedbackRefreshTrigger, setFeedbackRefreshTrigger] = useState(0);
   const [showMasterManagement, setShowMasterManagement] = useState(false);
 
   const refreshBooks = () => {
     setRefreshTrigger(prev => prev + 1);
+  };
+
+  const refreshFeedbacks = () => {
+    setFeedbackRefreshTrigger(prev => prev + 1);
   };
 
   const handleBookReturn = async (bookId: number) => {
@@ -95,8 +102,9 @@ function App() {
         </div>
       ) : (
         <Tabs defaultValue="borrow" className="mb-8">
-          <TabsList className="grid w-full grid-cols-1 mb-4">
+          <TabsList className="grid w-full grid-cols-2 mb-4">
             <TabsTrigger value="borrow">貸出・返却管理</TabsTrigger>
+            <TabsTrigger value="feedback">フィードバック</TabsTrigger>
           </TabsList>
           
           <TabsContent value="borrow">
@@ -107,6 +115,13 @@ function App() {
               showDeleteButton={false}
               showBorrowReturnButtons={true}
             />
+          </TabsContent>
+          
+          <TabsContent value="feedback">
+            <div className="space-y-8">
+              <FeedbackForm onSuccess={refreshFeedbacks} />
+              <FeedbackList refreshTrigger={feedbackRefreshTrigger} />
+            </div>
           </TabsContent>
         </Tabs>
       )}

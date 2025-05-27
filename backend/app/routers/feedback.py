@@ -15,6 +15,7 @@ class FeedbackBase(BaseModel):
     title: str
     description: str
     category: str  # "bug", "feature", "improvement"
+    author_name: str
 
 class FeedbackCreate(FeedbackBase):
     pass
@@ -33,6 +34,7 @@ def domain_to_dto(feedback: DomainFeedback) -> Feedback:
         title=feedback.title,
         description=feedback.description,
         category=feedback.category,
+        author_name=feedback.author_name,
         created_at=feedback.created_at,
         github_issue_url=feedback.github_issue_url
     )
@@ -44,7 +46,8 @@ async def create_feedback(feedback: FeedbackCreate, service: FeedbackService = D
         domain_feedback = service.create_feedback(
             title=feedback.title,
             description=feedback.description,
-            category=feedback.category
+            category=feedback.category,
+            author_name=feedback.author_name
         )
         return domain_to_dto(domain_feedback)
     except ValueError as e:

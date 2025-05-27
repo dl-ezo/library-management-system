@@ -48,6 +48,7 @@ class GitHubService:
             body = f"""## フィードバック詳細
 
 **カテゴリ**: {self._get_category_display_name(feedback.category)}
+**投稿者**: {feedback.author_name}
 
 **詳細**:
 {feedback.description}

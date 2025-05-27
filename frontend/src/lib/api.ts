@@ -1,4 +1,5 @@
 import { Book } from '../types/book';
+import { Feedback, FeedbackCreate, FeedbackCategory } from '../types/feedback';
 
 // バックエンドがプレフィックスを付与するのでAPIのURLを明示的に指定
 const API_URL = '/api';
@@ -78,6 +79,39 @@ export const deleteBook = async (id: number): Promise<void> => {
   
   if (!response.ok) {
     throw new Error('Failed to delete book');
+  }
+  return response.json();
+};
+
+// フィードバック関連のAPI
+export const fetchFeedbacks = async (): Promise<Feedback[]> => {
+  const response = await fetch(`${API_URL}/feedback/`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch feedbacks');
+  }
+  return response.json();
+};
+
+export const createFeedback = async (feedback: FeedbackCreate): Promise<Feedback> => {
+  const response = await fetch(`${API_URL}/feedback/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(feedback),
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Failed to create feedback');
+  }
+  return response.json();
+};
+
+export const fetchFeedbackCategories = async (): Promise<FeedbackCategory[]> => {
+  const response = await fetch(`${API_URL}/feedback/categories/`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch feedback categories');
   }
   return response.json();
 };
