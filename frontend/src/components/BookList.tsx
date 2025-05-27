@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { fetchBooks } from '../lib/api';
 import { Book } from '../types/book';
 import { Input } from './ui/input';
@@ -28,6 +28,8 @@ export function BookList({
   const [titleSearch, setTitleSearch] = useState('');
   const [borrowerSearch, setBorrowerSearch] = useState('');
   const [loading, setLoading] = useState(false);
+  const [sortField, setSortField] = useState<'title' | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   const loadBooks = async () => {
     setLoading(true);
@@ -49,6 +51,35 @@ export function BookList({
     e.preventDefault();
     loadBooks();
   };
+
+  const handleSort = (field: 'title') => {
+    if (sortField === field) {
+      if (sortDirection === 'asc') {
+        setSortDirection('desc');
+      } else {
+        setSortField(null);
+        setSortDirection('asc');
+      }
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedBooks = useMemo(() => {
+    if (!sortField) return books;
+    
+    return [...books].sort((a, b) => {
+      const aValue = a[sortField];
+      const bValue = b[sortField];
+      
+      if (sortDirection === 'asc') {
+        return aValue.localeCompare(bValue, 'ja');
+      } else {
+        return bValue.localeCompare(aValue, 'ja');
+      }
+    });
+  }, [books, sortField, sortDirection]);
 
   return (
     <Card className="w-full">
@@ -81,21 +112,35 @@ export function BookList({
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>
-                <TableHead>タイトル</TableHead>
+                <TableHead>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleSort('title')}
+                    className="p-0 h-auto font-medium"
+                  >
+                    タイトル
+                    {sortField === 'title' && (
+                      <span className="ml-1">
+                        {sortDirection === 'asc' ? '↑' : '↓'}
+                      </span>
+                    )}
+                  </Button>
+                </TableHead>
                 <TableHead>借りている人</TableHead>
                 <TableHead>返却予定日</TableHead>
                 <TableHead>アクション</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {books.length === 0 ? (
+              {sortedBooks.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center">
                     図書が見つかりません
                   </TableCell>
                 </TableRow>
               ) : (
-                books.map((book) => (
+                sortedBooks.map((book) => (
                   <TableRow key={book.id}>
                     <TableCell>{book.id}</TableCell>
                     <TableCell>{book.title}</TableCell>
