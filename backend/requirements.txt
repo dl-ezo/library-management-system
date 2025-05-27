@@ -2,3 +2,4 @@ fastapi[standard]>=0.115.12
 psycopg[binary]>=3.2.6
 pydantic-settings>=2.2.1
 uvicorn[standard]>=0.27.1
+PyGithub>=2.1.1

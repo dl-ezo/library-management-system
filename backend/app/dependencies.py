@@ -1,5 +1,8 @@
 from app.application.services import BookService
+from app.application.feedback_services import FeedbackService
+from app.application.github_service import GitHubService
 from app.infrastructure.repositories import InMemoryBookRepository
+from app.infrastructure.feedback_repositories import InMemoryFeedbackRepository
 from app.infrastructure.postgres_repository import PostgresBookRepository
 from app.infrastructure.database import get_connection, init_db, is_test_mode
 import os
@@ -10,6 +13,11 @@ init_db()
 # シングルトンのリポジトリインスタンス
 _repository_instance = None
 _service_instance = None
+
+# フィードバック用シングルトンインスタンス
+_feedback_repository_instance = None
+_feedback_service_instance = None
+_github_service_instance = None
 
 def get_book_service():
     """BookServiceのインスタンスを取得する"""
@@ -30,3 +38,22 @@ def get_book_service():
         _service_instance = BookService(repository=_repository_instance)
     
     return _service_instance
+
+def get_feedback_service():
+    """FeedbackServiceのインスタンスを取得する"""
+    global _feedback_repository_instance, _feedback_service_instance, _github_service_instance
+    
+    if _feedback_service_instance is None:
+        # フィードバックリポジトリのインスタンス作成
+        _feedback_repository_instance = InMemoryFeedbackRepository()
+        
+        # GitHubサービスのインスタンス作成
+        _github_service_instance = GitHubService()
+        
+        # フィードバックサービスのインスタンス作成
+        _feedback_service_instance = FeedbackService(
+            repository=_feedback_repository_instance,
+            github_service=_github_service_instance
+        )
+    
+    return _feedback_service_instance

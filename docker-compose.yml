@@ -5,6 +5,8 @@ services:
       - "8000:8000"
     environment:
       - PORT=8000
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - GITHUB_REPO=${GITHUB_REPO}
   
   frontend:
     build: ./frontend
