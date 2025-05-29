@@ -6,11 +6,11 @@ from app.application.user_services import UserService
 from app.dependencies import get_user_service
 from app.domain.user_models import User
 
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
 security_optional = HTTPBearer(auto_error=False)
 
 def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
     user_service: UserService = Depends(get_user_service)
 ) -> User:
     """現在のユーザーを取得する"""
@@ -19,6 +19,9 @@ def get_current_user(
         detail="認証に失敗しました",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    
+    if credentials is None:
+        raise credentials_exception
     
     token_data = verify_token(credentials.credentials, credentials_exception)
     user = user_service.get_user_by_username(token_data.username)
