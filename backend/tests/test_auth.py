@@ -5,19 +5,23 @@ from app.infrastructure.user_repositories import InMemoryUserRepository
 from app.application.user_services import UserService
 from app.dependencies import get_user_service
 
-# テスト用のユーザーリポジトリ
-_test_user_repository = InMemoryUserRepository()
-
-def get_test_user_service():
-    return UserService(repository=_test_user_repository)
+@pytest.fixture(scope="module")
+def test_user_repository():
+    """テスト用のUserリポジトリを作成"""
+    return InMemoryUserRepository()
 
 @pytest.fixture(scope="module")
-def client():
+def client(test_user_repository):
+    """テスト用クライアントを作成"""
+    def get_test_user_service():
+        return UserService(repository=test_user_repository)
+    
     app.dependency_overrides[get_user_service] = get_test_user_service
     
     with TestClient(app) as test_client:
         yield test_client
     
+    # クリーンアップ
     app.dependency_overrides = {}
 
 def test_register_user(client):
