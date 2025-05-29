@@ -1,11 +1,9 @@
 import { Book } from '../types/book';
 import { Feedback, FeedbackCreate, FeedbackCategory } from '../types/feedback';
-
-// バックエンドがプレフィックスを付与するのでAPIのURLを明示的に指定
-const API_URL = '/api';
+import { apiClient } from './apiClient';
 
 export const fetchBooks = async (title?: string, borrowerName?: string): Promise<Book[]> => {
-  let url = `${API_URL}/books/`;
+  let url = `/books/`;
   const params = new URLSearchParams();
   
   if (title) params.append('title', title);
@@ -15,7 +13,7 @@ export const fetchBooks = async (title?: string, borrowerName?: string): Promise
     url += `?${params.toString()}`;
   }
   
-  const response = await fetch(url);
+  const response = await apiClient.get(url);
   if (!response.ok) {
     throw new Error('Failed to fetch books');
   }
@@ -23,7 +21,7 @@ export const fetchBooks = async (title?: string, borrowerName?: string): Promise
 };
 
 export const fetchBook = async (id: number): Promise<Book> => {
-  const response = await fetch(`${API_URL}/books/${id}`);
+  const response = await apiClient.get(`/books/${id}`);
   if (!response.ok) {
     throw new Error('Failed to fetch book');
   }
@@ -31,13 +29,7 @@ export const fetchBook = async (id: number): Promise<Book> => {
 };
 
 export const createBook = async (title: string): Promise<Book> => {
-  const response = await fetch(`${API_URL}/books/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ title }),
-  });
+  const response = await apiClient.post('/books/', { title });
   
   if (!response.ok) {
     throw new Error('Failed to create book');
@@ -46,12 +38,9 @@ export const createBook = async (title: string): Promise<Book> => {
 };
 
 export const borrowBook = async (id: number, borrowerName: string, returnDate: string): Promise<Book> => {
-  const response = await fetch(`${API_URL}/books/${id}/borrow`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ borrower_name: borrowerName, return_date: returnDate }),
+  const response = await apiClient.put(`/books/${id}/borrow`, {
+    borrower_name: borrowerName,
+    return_date: returnDate
   });
   
   if (!response.ok) {
@@ -62,9 +51,7 @@ export const borrowBook = async (id: number, borrowerName: string, returnDate: s
 };
 
 export const returnBook = async (id: number): Promise<Book> => {
-  const response = await fetch(`${API_URL}/books/${id}/return`, {
-    method: 'PUT',
-  });
+  const response = await apiClient.put(`/books/${id}/return`);
   
   if (!response.ok) {
     throw new Error('Failed to return book');
@@ -73,9 +60,7 @@ export const returnBook = async (id: number): Promise<Book> => {
 };
 
 export const deleteBook = async (id: number): Promise<void> => {
-  const response = await fetch(`${API_URL}/books/${id}`, {
-    method: 'DELETE',
-  });
+  const response = await apiClient.delete(`/books/${id}`);
   
   if (!response.ok) {
     throw new Error('Failed to delete book');
@@ -85,7 +70,7 @@ export const deleteBook = async (id: number): Promise<void> => {
 
 // フィードバック関連のAPI
 export const fetchFeedbacks = async (): Promise<Feedback[]> => {
-  const response = await fetch(`${API_URL}/feedback/`);
+  const response = await apiClient.get('/feedback/');
   if (!response.ok) {
     throw new Error('Failed to fetch feedbacks');
   }
@@ -93,13 +78,7 @@ export const fetchFeedbacks = async (): Promise<Feedback[]> => {
 };
 
 export const createFeedback = async (feedback: FeedbackCreate): Promise<Feedback> => {
-  const response = await fetch(`${API_URL}/feedback/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(feedback),
-  });
+  const response = await apiClient.post('/feedback/', feedback);
   
   if (!response.ok) {
     const errorData = await response.json();
@@ -109,7 +88,7 @@ export const createFeedback = async (feedback: FeedbackCreate): Promise<Feedback
 };
 
 export const fetchFeedbackCategories = async (): Promise<FeedbackCategory[]> => {
-  const response = await fetch(`${API_URL}/feedback/categories/`);
+  const response = await apiClient.get('/feedback/categories/');
   if (!response.ok) {
     throw new Error('Failed to fetch feedback categories');
   }

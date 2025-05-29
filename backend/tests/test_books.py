@@ -2,28 +2,28 @@ import pytest
 from fastapi.testclient import TestClient
 from datetime import date, timedelta
 
-# テスト時にapp.mainをインポートするためのインポート
 from app.main import app
-
-# テストクライアントを作成
-from app.main import app
-from fastapi.testclient import TestClient
 from app.infrastructure.repositories import InMemoryBookRepository
 from app.application.services import BookService
 from app.dependencies import get_book_service
 
-_test_repository = InMemoryBookRepository()
-
-def get_test_book_service():
-    return BookService(repository=_test_repository)
+@pytest.fixture(scope="module")
+def test_book_repository():
+    """テスト用のBookリポジトリを作成"""
+    return InMemoryBookRepository()
 
 @pytest.fixture(scope="module")
-def client():
+def client(test_book_repository):
+    """テスト用クライアントを作成"""
+    def get_test_book_service():
+        return BookService(repository=test_book_repository)
+    
     app.dependency_overrides[get_book_service] = get_test_book_service
     
     with TestClient(app) as test_client:
         yield test_client
     
+    # クリーンアップ
     app.dependency_overrides = {}
 
 def test_create_book(client):

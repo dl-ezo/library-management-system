@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import { borrowBook } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -11,18 +12,17 @@ interface BorrowBookFormProps {
 }
 
 export function BorrowBookForm({ bookId, onBookBorrowed }: BorrowBookFormProps) {
-  const [borrowerName, setBorrowerName] = useState('');
+  const { user } = useAuth();
   const [returnDate, setReturnDate] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!borrowerName.trim() || !returnDate) return;
+    if (!returnDate || !user) return;
 
     setLoading(true);
     try {
-      await borrowBook(bookId, borrowerName, returnDate);
-      setBorrowerName('');
+      await borrowBook(bookId, user.display_name, returnDate);
       setReturnDate('');
       onBookBorrowed();
     } catch (error) {
@@ -38,17 +38,20 @@ export function BorrowBookForm({ bookId, onBookBorrowed }: BorrowBookFormProps) 
         <CardTitle>本を借りる</CardTitle>
       </CardHeader>
       <CardContent>
+        {user && (
+          <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+            <p className="text-sm text-blue-700">
+              借りる人: <span className="font-semibold">{user.display_name}</span>
+            </p>
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
+            <label htmlFor="returnDate" className="block text-sm font-medium mb-2">
+              返却予定日
+            </label>
             <Input
-              placeholder="お名前"
-              value={borrowerName}
-              onChange={(e) => setBorrowerName(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <Input
+              id="returnDate"
               type="date"
               value={returnDate}
               onChange={(e) => setReturnDate(e.target.value)}
