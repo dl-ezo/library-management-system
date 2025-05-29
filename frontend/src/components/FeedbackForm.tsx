@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createFeedback, fetchFeedbackCategories } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 import { FeedbackCreate, FeedbackCategory } from '../types/feedback';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
@@ -14,11 +15,11 @@ interface FeedbackFormProps {
 }
 
 export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
-  const [formData, setFormData] = useState<FeedbackCreate>({
+  const { user } = useAuth();
+  const [formData, setFormData] = useState<Omit<FeedbackCreate, 'author_name'>>({
     title: '',
     description: '',
-    category: 'improvement',
-    author_name: ''
+    category: 'improvement'
   });
   const [categories, setCategories] = useState<FeedbackCategory[]>([]);
   const [loading, setLoading] = useState(false);
@@ -40,12 +41,18 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
+
     setLoading(true);
     setError(null);
     setSuccess(null);
 
     try {
-      const result = await createFeedback(formData);
+      const feedbackData: FeedbackCreate = {
+        ...formData,
+        author_name: user.display_name
+      };
+      const result = await createFeedback(feedbackData);
       
       const successMessage = result.github_issue_url 
         ? 'フィードバックを送信し、GitHub Issueを作成しました！'
@@ -60,8 +67,7 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
       setFormData({
         title: '',
         description: '',
-        category: 'improvement',
-        author_name: ''
+        category: 'improvement'
       });
       
       onSuccess?.();
@@ -72,7 +78,7 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
     }
   };
 
-  const handleChange = (field: keyof FeedbackCreate, value: string) => {
+  const handleChange = (field: keyof Omit<FeedbackCreate, 'author_name'>, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -111,19 +117,15 @@ export function FeedbackForm({ onSuccess }: FeedbackFormProps) {
           </Alert>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="author_name" className="block text-sm font-medium mb-2">
-              お名前 *
-            </label>
-            <Input
-              id="author_name"
-              value={formData.author_name}
-              onChange={(e) => handleChange('author_name', e.target.value)}
-              placeholder="お名前を入力してください"
-              required
-            />
+        {user && (
+          <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+            <p className="text-sm text-blue-700">
+              投稿者: <span className="font-semibold">{user.display_name}</span>
+            </p>
           </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
 
           <div>
             <label htmlFor="title" className="block text-sm font-medium mb-2">
