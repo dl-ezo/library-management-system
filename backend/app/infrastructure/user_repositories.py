@@ -127,7 +127,7 @@ class PostgresUserRepository(UserRepository):
 def get_user_repository() -> UserRepository:
     """ユーザーリポジトリを取得する"""
     is_test_mode = os.environ.get("TEST_MODE", "0") == "1"
-    if is_test_mode:
+    if is_test_mode or get_connection() is None:
         return InMemoryUserRepository()
     else:
         return PostgresUserRepository()

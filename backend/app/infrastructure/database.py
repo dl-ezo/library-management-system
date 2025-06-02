@@ -18,6 +18,7 @@ def get_connection():
             db_url = db_url.replace('postgres://', 'postgresql://', 1)
         return psycopg.connect(db_url)
     else:
+        # DATABASE_URLが設定されていない場合はインメモリモードとして扱う
         return None
 
 def init_db():
