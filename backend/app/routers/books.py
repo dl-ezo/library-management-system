@@ -1,41 +1,31 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List, Optional, Dict
 from datetime import date
-from pydantic import BaseModel
+# Removed pydantic BaseModel import as it's no longer directly used here
 from app.application.services import BookService
 from app.domain.models import Book as DomainBook
 from app.dependencies import get_book_service
+from app.models.book import Book, BookCreate # Added import
 
 router = APIRouter(
     prefix="/books",
     tags=["books"],
 )
 
-class BookBase(BaseModel):
-    title: str
-
-class BookCreate(BookBase):
-    pass
-
-class Book(BookBase):
-    id: int
-    borrower_name: Optional[str] = None
-    return_date: Optional[date] = None
-
-    class Config:
-        from_attributes = True
+# Removed BookBase, BookCreate, and Book class definitions
 
 def domain_to_dto(book: DomainBook) -> Book:
     return Book(
         id=book.id,
         title=book.title,
+        author=book.author,
         borrower_name=book.borrower_name,
         return_date=book.return_date
     )
 
 @router.post("/", response_model=Book)
 async def create_book(book: BookCreate, service: BookService = Depends(get_book_service)):
-    domain_book = service.create_book(book.title)
+    domain_book = service.create_book(title=book.title, author=book.author)
     return domain_to_dto(domain_book)
 
 @router.get("/", response_model=List[Book])
