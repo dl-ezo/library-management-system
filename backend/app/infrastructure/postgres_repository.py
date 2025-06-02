@@ -16,8 +16,8 @@ class PostgresBookRepository(BookRepository):
 
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO books (title, borrower_name, return_date) VALUES (%s, %s, %s) RETURNING id",
-                (book.title, book.borrower_name, book.return_date)
+                "INSERT INTO books (title, author, borrower_name, return_date) VALUES (%s, %s, %s, %s) RETURNING id",
+                (book.title, book.author, book.borrower_name, book.return_date)
             )
             book.id = cur.fetchone()[0]
         conn.commit()
@@ -31,12 +31,12 @@ class PostgresBookRepository(BookRepository):
             return InMemoryBookRepository().get_by_id(book_id)
 
         with conn.cursor() as cur:
-            cur.execute("SELECT id, title, borrower_name, return_date FROM books WHERE id = %s", (book_id,))
+            cur.execute("SELECT id, title, author, borrower_name, return_date FROM books WHERE id = %s", (book_id,))
             result = cur.fetchone()
             if not result:
                 return None
-            id, title, borrower_name, return_date = result
-            book = Book(id=id, title=title, borrower_name=borrower_name, return_date=return_date)
+            id, title, author, borrower_name, return_date = result
+            book = Book(id=id, title=title, author=author, borrower_name=borrower_name, return_date=return_date)
         conn.close()
         return book
 
@@ -48,10 +48,10 @@ class PostgresBookRepository(BookRepository):
 
         books = []
         with conn.cursor() as cur:
-            cur.execute("SELECT id, title, borrower_name, return_date FROM books")
+            cur.execute("SELECT id, title, author, borrower_name, return_date FROM books")
             for row in cur.fetchall():
-                id, title, borrower_name, return_date = row
-                books.append(Book(id=id, title=title, borrower_name=borrower_name, return_date=return_date))
+                id, title, author, borrower_name, return_date = row
+                books.append(Book(id=id, title=title, author=author, borrower_name=borrower_name, return_date=return_date))
         conn.close()
         return books
 
@@ -62,12 +62,17 @@ class PostgresBookRepository(BookRepository):
             return InMemoryBookRepository().search(title, borrower_name)
 
         books = []
-        query = "SELECT id, title, borrower_name, return_date FROM books WHERE 1=1"
+        query = "SELECT id, title, author, borrower_name, return_date FROM books WHERE 1=1"
         params = []
 
         if title:
             query += " AND title ILIKE %s"
             params.append(f"%{title}%")
+
+        # TODO: Add author to search parameters if needed in the future
+        # if author:
+        #     query += " AND author ILIKE %s"
+        #     params.append(f"%{author}%")
 
         if borrower_name:
             query += " AND borrower_name ILIKE %s"
@@ -76,8 +81,8 @@ class PostgresBookRepository(BookRepository):
         with conn.cursor() as cur:
             cur.execute(query, params)
             for row in cur.fetchall():
-                id, title, borrower_name, return_date = row
-                books.append(Book(id=id, title=title, borrower_name=borrower_name, return_date=return_date))
+                id, title, author, borrower_name, return_date = row
+                books.append(Book(id=id, title=title, author=author, borrower_name=borrower_name, return_date=return_date))
         conn.close()
         return books
 
@@ -89,8 +94,8 @@ class PostgresBookRepository(BookRepository):
 
         with conn.cursor() as cur:
             cur.execute(
-                "UPDATE books SET title = %s, borrower_name = %s, return_date = %s WHERE id = %s",
-                (book.title, book.borrower_name, book.return_date, book.id)
+                "UPDATE books SET title = %s, author = %s, borrower_name = %s, return_date = %s WHERE id = %s",
+                (book.title, book.author, book.borrower_name, book.return_date, book.id)
             )
         conn.commit()
         conn.close()

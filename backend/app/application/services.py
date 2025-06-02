@@ -9,9 +9,9 @@ class BookService:
     def __init__(self, repository: BookRepository):
         self.repository = repository
     
-    def create_book(self, title: str) -> Book:
+    def create_book(self, title: str, author: Optional[str] = None) -> Book:
         """新しい本を作成する"""
-        book = Book(id=0, title=title)
+        book = Book(id=0, title=title, author=author)
         return self.repository.add(book)
     
     def get_books(self, title: Optional[str] = None, borrower_name: Optional[str] = None) -> List[Book]:
