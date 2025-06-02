@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List, Optional, Dict
 from datetime import date
-# Removed pydantic BaseModel import as it's no longer directly used here
+from pydantic import BaseModel # Added import
 from app.application.services import BookService
 from app.domain.models import Book as DomainBook
 from app.dependencies import get_book_service
