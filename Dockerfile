@@ -12,7 +12,7 @@ RUN npm run build
 FROM python:3.12-slim as backend-builder
 WORKDIR /app/backend
 RUN pip install poetry
-COPY backend/pyproject.toml backend/poetry.lock ./
+COPY backend/pyproject.toml ./
 RUN poetry config virtualenvs.create false && \
     poetry install --without dev --no-root --no-interaction --no-ansi
 
