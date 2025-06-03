@@ -5,19 +5,37 @@ import { AddBookForm } from './components/AddBookForm';
 import { BorrowBookForm } from './components/BorrowBookForm';
 import { FeedbackForm } from './components/FeedbackForm';
 import { FeedbackList } from './components/FeedbackList';
+import { AuthPage } from './components/AuthPage';
+import { UserHeader } from './components/UserHeader';
 import { returnBook, deleteBook } from './lib/api';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Settings } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { ThemeToggle } from './components/theme/ThemeToggle';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
-function App() {
+function LibraryApp() {
+  const { isAuthenticated, isLoading } = useAuth();
   const [selectedBookId, setSelectedBookId] = useState<number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [feedbackRefreshTrigger, setFeedbackRefreshTrigger] = useState(0);
   const [showMasterManagement, setShowMasterManagement] = useState(false);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-lg">読み込み中...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <AuthPage />;
+  }
 
   const refreshBooks = () => {
     setRefreshTrigger(prev => prev + 1);
@@ -81,6 +99,8 @@ function App() {
         </div>
       </div>
       
+      <UserHeader />
+      
       {showMasterManagement ? (
         <div className="space-y-8">
           <div className="flex justify-between items-center mb-4">
@@ -140,6 +160,14 @@ function App() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <LibraryApp />
+    </AuthProvider>
   );
 }
 

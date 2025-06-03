@@ -18,6 +18,7 @@ def get_connection():
             db_url = db_url.replace('postgres://', 'postgresql://', 1)
         return psycopg.connect(db_url)
     else:
+        # DATABASE_URLが設定されていない場合はインメモリモードとして扱う
         return None
 
 def init_db():
@@ -26,6 +27,18 @@ def init_db():
     if conn:
         # PostgreSQL用のテーブル作成クエリ
         cursor = conn.cursor()
+        
+        # ユーザーテーブル
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            username VARCHAR(50) UNIQUE NOT NULL,
+            display_name VARCHAR(100) NOT NULL,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        )
+        """)
+        
+        # 既存のbooksテーブル（そのまま維持）
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS books (
             id SERIAL PRIMARY KEY,
@@ -34,5 +47,19 @@ def init_db():
             return_date DATE
         )
         """)
+        
+        # フィードバックテーブルも更新（もし存在すれば）
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS feedback (
+            id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL,
+            description TEXT NOT NULL,
+            category TEXT NOT NULL,
+            author_name TEXT NOT NULL,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+            github_issue_url TEXT
+        )
+        """)
+        
         conn.commit()
         conn.close()
