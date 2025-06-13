@@ -31,13 +31,13 @@ export const fetchBook = async (id: number): Promise<Book> => {
   return response.json();
 };
 
-export const createBook = async (title: string): Promise<Book> => {
+export const createBook = async (bookData: { title: string; author?: string }): Promise<Book> => {
   const response = await fetch(`${API_URL}/books/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ title }),
+    body: JSON.stringify(bookData),
   });
   
   if (!response.ok) {

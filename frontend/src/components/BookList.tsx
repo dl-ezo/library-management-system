@@ -135,6 +135,7 @@ export function BookList({
                     {getSortIcon()}
                   </Button>
                 </TableHead>
+                <TableHead>著者</TableHead> {/* Added Author Header */}
                 <TableHead>借りている人</TableHead>
                 <TableHead>返却予定日</TableHead>
                 <TableHead>アクション</TableHead>
@@ -143,7 +144,8 @@ export function BookList({
             <TableBody>
               {books.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">
+                  {/* Updated colSpan */}
+                  <TableCell colSpan={6} className="text-center">
                     図書が見つかりません
                   </TableCell>
                 </TableRow>
@@ -152,6 +154,7 @@ export function BookList({
                   <TableRow key={book.id}>
                     <TableCell>{book.id}</TableCell>
                     <TableCell>{book.title}</TableCell>
+                    <TableCell>{book.author || '-'}</TableCell> {/* Added Author Cell */}
                     <TableCell>{book.borrower_name || '-'}</TableCell>
                     <TableCell>
                       {book.return_date ? format(new Date(book.return_date), 'yyyy/MM/dd') : '-'}

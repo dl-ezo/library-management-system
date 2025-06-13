@@ -5,9 +5,10 @@ from pydantic import BaseModel
 class Book:
     """本のドメインモデル"""
     
-    def __init__(self, id: int, title: str, borrower_name: Optional[str] = None, return_date: Optional[date] = None):
+    def __init__(self, id: int, title: str, author: Optional[str] = None, borrower_name: Optional[str] = None, return_date: Optional[date] = None):
         self.id = id
         self.title = title
+        self.author = author
         self.borrower_name = borrower_name
         self.return_date = return_date
     
