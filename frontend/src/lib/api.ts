@@ -1,5 +1,6 @@
 import { Book } from '../types/book';
 import { Feedback, FeedbackCreate, FeedbackCategory } from '../types/feedback';
+import { RecommendationResponse } from '../types/recommendation';
 
 // バックエンドがプレフィックスを付与するのでAPIのURLを明示的に指定
 const API_URL = '/api';
@@ -112,6 +113,23 @@ export const fetchFeedbackCategories = async (): Promise<FeedbackCategory[]> => 
   const response = await fetch(`${API_URL}/feedback/categories/`);
   if (!response.ok) {
     throw new Error('Failed to fetch feedback categories');
+  }
+  return response.json();
+};
+
+// AI書籍推薦API
+export const getBookRecommendations = async (query: string): Promise<RecommendationResponse> => {
+  const response = await fetch(`${API_URL}/books/recommendations/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ query }),
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Failed to get book recommendations');
   }
   return response.json();
 };
