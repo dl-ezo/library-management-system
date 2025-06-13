@@ -18,6 +18,10 @@
     "PYTHON_VERSION": {
       "description": "Python version to use",
       "value": "3.12.0"
+    },
+    "ANTHROPIC_API_KEY": {
+      "description": "Anthropic API key for AI book recommendations",
+      "required": true
     }
   }
 }

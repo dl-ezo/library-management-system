@@ -7,6 +7,7 @@ services:
       - PORT=8000
       - GITHUB_TOKEN=${GITHUB_TOKEN}
       - GITHUB_REPO=${GITHUB_REPO}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
   
   frontend:
     build: ./frontend

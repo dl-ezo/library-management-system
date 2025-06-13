@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
 import psycopg
-from app.routers import books, feedback
+from app.routers import books, feedback, recommendations
 
 app = FastAPI(title="Company Library Management System")
 
@@ -23,6 +23,7 @@ app.add_middleware(
 
 app.include_router(books.router, prefix="/api")
 app.include_router(feedback.router, prefix="/api")
+app.include_router(recommendations.router, prefix="/api")
 
 @app.get("/healthz")
 async def healthz():

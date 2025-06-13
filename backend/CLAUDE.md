@@ -46,21 +46,50 @@ python -m pytest
 
 ## 依存関係管理の重要事項
 
-新しいPythonパッケージを追加する際は、以下の**両方**のファイルを必ず更新してください：
+新しいPythonパッケージを追加する際は、以下の**手順を必ず守ってください**：
 
-1. **`pyproject.toml`** - Poetry用の依存関係定義（CI/CDで使用）
-2. **`requirements.txt`** - Herokuデプロイ用の依存関係定義
+### ⚠️ 重要な手順（CI/CDテスト失敗を防ぐため）
 
-### 例：PyGithubパッケージの追加
+1. **`pyproject.toml`を更新** - Poetry用の依存関係定義（CI/CDで使用）
+2. **`requirements.txt`を更新** - Herokuデプロイ用の依存関係定義
+3. **`poetry lock`を実行** - poetry.lockファイルを更新（**これを忘れるとCI/CDが失敗します**）
+
+### 実行手順
+
+```bash
+# 1. pyproject.tomlに依存関係を追加
+# 2. requirements.txtに依存関係を追加
+# 3. 重要：poetry.lockファイルを更新
+cd backend
+poetry lock
+```
+
+### 例：Anthropic APIパッケージの追加
 
 ```toml
 # pyproject.toml の [tool.poetry.dependencies] セクションに追加
-pygithub = "^2.1.1"
+anthropic = "^0.40.0"
 ```
 
 ```txt
 # requirements.txt に追加
-PyGithub>=2.1.1
+anthropic>=0.40.0
 ```
 
-**注意**: `pyproject.toml`のみ更新してCI/CDが失敗するケースが発生したため、必ず両方のファイルを同期してください。
+```bash
+# 必須：poetry.lockを更新
+poetry lock
+```
+
+### よくある失敗パターン
+
+❌ **やってはいけないこと**：
+- `pyproject.toml`のみ更新して`poetry lock`を忘れる
+- `requirements.txt`の更新を忘れる
+
+✅ **正しい手順**：
+1. 両方のファイルを更新
+2. `poetry lock`を実行
+3. 変更をコミット・プッシュ
+
+**注意**: `poetry.lock`の更新を忘れると「pyproject.toml changed significantly since poetry.lock was last generated」エラーでCI/CDテストが失敗します。

@@ -5,6 +5,7 @@ import { AddBookForm } from './components/AddBookForm';
 import { BorrowBookForm } from './components/BorrowBookForm';
 import { FeedbackForm } from './components/FeedbackForm';
 import { FeedbackList } from './components/FeedbackList';
+import { BookRecommendations } from './components/BookRecommendations';
 import { returnBook, deleteBook } from './lib/api';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
@@ -102,8 +103,9 @@ function App() {
         </div>
       ) : (
         <Tabs defaultValue="borrow" className="mb-8">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsList className="grid w-full grid-cols-3 mb-4">
             <TabsTrigger value="borrow">貸出・返却管理</TabsTrigger>
+            <TabsTrigger value="recommendations">AIおすすめ</TabsTrigger>
             <TabsTrigger value="feedback">フィードバック</TabsTrigger>
           </TabsList>
           
@@ -115,6 +117,10 @@ function App() {
               showDeleteButton={false}
               showBorrowReturnButtons={true}
             />
+          </TabsContent>
+          
+          <TabsContent value="recommendations">
+            <BookRecommendations />
           </TabsContent>
           
           <TabsContent value="feedback">
